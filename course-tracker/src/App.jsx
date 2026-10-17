@@ -1,16 +1,18 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import bundledPlaylist from './data/playlist.json'
 import { BookOpen, Check, CheckCircle2, Clock3, Download, ExternalLink, FileJson, Flame, HardDrive, LayoutGrid, List, Play, Plus, RefreshCw, Search, Settings2, Sparkles, StickyNote, Upload, Youtube } from 'lucide-react'
 
 const PLAYLIST = 'https://www.youtube.com/playlist?list=PLjTveVh7FakLdTmm42TMxbN8PvVn5g4KJ'
 const PLAYLIST_ID = 'PLjTveVh7FakLdTmm42TMxbN8PvVn5g4KJ'
 const STORE = 'courseflow:v1'
 const KEY_STORE = 'courseflow:youtube-api-key'
-const initialVideo = [{ id: 'empty', title: 'Import your playlist to get started', position: 1, thumbnail: '', duration: '', description: '' }]
+const initialVideo = [{ id: 'empty', title: 'Playlist data is not bundled yet. Generate src/data/playlist.json to load lessons.', position: 1, thumbnail: '', duration: '', description: '' }]
+const bundledVideos = Array.isArray(bundledPlaylist.videos) ? bundledPlaylist.videos : []
 const durationText = (s='') => { const m=s.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/); if(!m)return s||'—'; const h=+(m[1]||0),n=+(m[2]||0),sec=+(m[3]||0); return h?`${h}h ${n}m`:`${n}m ${String(sec).padStart(2,'0')}s` }
 const seconds = (s='') => { const m=s.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/); return m?+(m[1]||0)*3600+ +(m[2]||0)*60+ +(m[3]||0):0 }
 function App(){
  const saved = useMemo(()=>{try{return JSON.parse(localStorage.getItem(STORE)||'null')}catch{return null}},[])
- const [videos,setVideos]=useState(saved?.videos?.length?saved.videos:initialVideo)
+ const [videos,setVideos]=useState(saved?.videos?.some(v=>v.id!=='empty')?saved.videos:(bundledVideos.length?bundledVideos:initialVideo))
  const [statuses,setStatuses]=useState(saved?.statuses||{})
  const [notes,setNotes]=useState(saved?.notes||{})
  const [apiKey,setApiKey]=useState(()=>localStorage.getItem(KEY_STORE)||'')
